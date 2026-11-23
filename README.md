@@ -70,26 +70,30 @@ The tests use the **Page Object Model**. Page classes inherit shared navigation 
 
 Each test starts a fresh WebDriver session. The baseline uses an implicit wait of zero and explicit waits for elements, dialogs and alerts. `WaitExperiment` is a separate diagnostic utility and is not part of the three acceptance tests.
 
-## Test results
+## Test results (R7.1)
 
-The last verified user-run suite (R5) completed successfully on **23 November 2026**, using Windows 10, Java 17 and Chrome 157:
+The R7.1 suite was executed locally on 23 November 2026 using Chrome 157 and Java 17. The available Maven console evidence contains four sequential runs:
 
-```text
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
-BUILD SUCCESS
-```
+| Run | TestNG result | Maven result |
+| --- | --- | --- |
+| 1 | 3 passed, 0 failed | BUILD SUCCESS |
+| 2 | 3 passed, 0 failed | BUILD SUCCESS |
+| 3 | 2 passed, 1 failed (AE03 step 2: contact form not displayed) | BUILD FAILURE |
+| 4 | 3 passed, 0 failed | BUILD SUCCESS |
 
-Total Maven build time: **1 min 12 sec**. Ad-host blocking was enabled. These results apply to R5 only. R7 contains source-level quality changes and has not yet been executed.
+The last run's Surefire XML/TXT reports confirm three tests, zero failures, zero errors and zero skipped. Earlier runs are supported by console logs only. The intermittent AE03 failure remains a known stability risk; the root cause was not established. Execution evidence is retained separately from this source repository.
 
-Maven writes detailed results to `target/surefire-reports/`. Failed tests also produce screenshots in `target/failure-screenshots/`.
+### Wait experiment (AC-05)
+
+The standalone `WaitExperiment` utility compared two-second waits on a deliberately missing element, using separate browser sessions:
+
+| Mode | Measured time |
+| --- | ---: |
+| Implicit-only | 2.018 s |
+| Explicit-only | 2.109 s |
+
+These are single measurements, not a performance benchmark. The normal acceptance suite uses explicit waits with implicit wait set to zero. Chrome 157 emitted a non-blocking CDP compatibility warning with Selenium 4.21.0.
 
 ## Notes
 
-- The test site is public and can be affected by advertising overlays or temporary server overload.
-- The Contact Us test uses a file from `src/test/resources/attachments/` and checks the native confirmation dialog before accepting it.
-- R7 requires a fresh `mvn clean test` run and separate `WaitExperiment` measurements before final sign-off.
-- A focused independent code re-review is required before submission.
-
-## R7.1 advertisement-handling experiment
-
-This variant removes `AdvertisementDialog` calls and its class while retaining Chrome ad-host blocking, consent handling, and existing click retries. It is an **unverified experiment**, not a confirmed stable release. Run `mvn clean test` three times and compare with R7; keep the original R7 archive as a rollback. A successful run does not guarantee all ads are blocked.
+The site is a public external test application, so availability and overlays may affect repeatability. Chrome ad-host blocking is enabled by default for the tested configuration. The source repository intentionally excludes local reports, screenshots, build output and internal project coordination records.
